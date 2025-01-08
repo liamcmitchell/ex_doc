@@ -220,3 +220,14 @@ export function el (tagName, attributes, children) {
   }
   return element
 }
+
+/**
+ * Create nodelist from HTML.
+ *
+ * @param {string} html
+ */
+export function nodesFromHtml (html) {
+  const element = document.createElement('div')
+  element.innerHTML = html
+  return element.childNodes
+}

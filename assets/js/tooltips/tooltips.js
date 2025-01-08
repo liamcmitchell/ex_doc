@@ -1,7 +1,6 @@
-import { qs, qsAll } from '../helpers'
+import { el, nodesFromHtml, qs, qsAll } from '../helpers'
 import { settingsStore } from '../settings-store'
 import { cancelHintFetchingIfAny, getHint, HINT_KIND, isValidHintHref } from './hints'
-import tooltipBodyTemplate from '../handlebars/templates/tooltip-body.handlebars'
 
 const TOOLTIP_HTML = '<div class="tooltip"><div class="tooltip-body"></div></div>'
 
@@ -92,17 +91,25 @@ function handleHoverStart (event) {
 }
 
 function renderTooltip (hint) {
-  const tooltipBodyHtml = tooltipBodyTemplate({
-    isPlain: hint.kind === HINT_KIND.plain,
-    hint
-  })
-
   let tooltipBody = qs(TOOLTIP_BODY_SELECTOR)
   if (!tooltipBody) {
     qs(CONTENT_INNER_SELECTOR).insertAdjacentHTML('beforeend', TOOLTIP_HTML)
     tooltipBody = qs(TOOLTIP_BODY_SELECTOR)
   }
-  tooltipBody.innerHTML = tooltipBodyHtml
+  tooltipBody.replaceChildren(...(
+    hint.kind === HINT_KIND.plain
+      ? [el('section', {class: 'docstring docstring-plain'}, [hint.description])]
+      : [
+          el('div', {class: 'detail-header'}, [
+            el('h1', {class: 'signature'}, [
+              el('span', {translate: 'no'}, [hint.title]),
+              el('div', {class: 'version-info', translate: 'no'}, [hint.version])
+            ])
+          ]),
+          hint.description &&
+            el('section', {class: 'docstring'}, nodesFromHtml(hint.description))
+        ].filter(Boolean)
+  ))
 
   updateTooltipPosition()
 
