@@ -1,7 +1,8 @@
 import { qs, qsAll } from '../helpers'
 import { settingsStore } from '../settings-store'
 import { cancelHintFetchingIfAny, getHint, HINT_KIND, isValidHintHref } from './hints'
-import tooltipBodyTemplate from '../handlebars/templates/tooltip-body.handlebars'
+import { html, render } from 'lit-html'
+import { unsafeHTML } from 'lit-html/directives/unsafe-html.js'
 
 const TOOLTIP_HTML = '<div class="tooltip"><div class="tooltip-body"></div></div>'
 
@@ -92,17 +93,25 @@ function handleHoverStart (event) {
 }
 
 function renderTooltip (hint) {
-  const tooltipBodyHtml = tooltipBodyTemplate({
-    isPlain: hint.kind === HINT_KIND.plain,
-    hint
-  })
-
   let tooltipBody = qs(TOOLTIP_BODY_SELECTOR)
   if (!tooltipBody) {
     qs(CONTENT_INNER_SELECTOR).insertAdjacentHTML('beforeend', TOOLTIP_HTML)
     tooltipBody = qs(TOOLTIP_BODY_SELECTOR)
   }
-  tooltipBody.innerHTML = tooltipBodyHtml
+  render(
+    hint.kind === HINT_KIND.plain
+      ? html`<section class="docstring docstring-plain">${hint.description}</section>`
+      : html`
+        <div class="detail-header">
+          <h1 class="signature">
+            <span translate="no">${hint.title}</span>
+            <div class="version-info" translate="no">${hint.version}</div>
+          </h1>
+        </div>
+        ${hint.description && html`<section class="docstring">${unsafeHTML(hint.description)}</section>`}
+      `,
+    tooltipBody
+  )
 
   updateTooltipPosition()
 

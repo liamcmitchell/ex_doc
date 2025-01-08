@@ -45,6 +45,7 @@
     "karma-esbuild": "^2.2.5",
     "karma-mocha": "^2.0.1",
     "karma-sourcemap-loader": "^0.3.5",
+    "lit-html": "^3.2.1",
     "lodash.throttle": "^4.1.1",
     "lunr": "^2.3.8",
     "mocha": "^10.2.0",
