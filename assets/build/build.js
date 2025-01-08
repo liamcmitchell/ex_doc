@@ -6,6 +6,7 @@ const fsExtra = require('fs-extra')
 const fs = require('node:fs/promises')
 const handlebars = require('handlebars')
 const util = require('node:util')
+const sveltePlugin = require('esbuild-svelte')
 
 const exec = util.promisify(cp.exec)
 
@@ -43,14 +44,14 @@ Promise.all(formatters.map(async ({formatter, ...options}) => {
   // Clean outdir.
   await fsExtra.emptyDir(options.outdir)
 
-  await esbuild.build({
+  options = {
     entryNames: watchMode ? '[name]-dev' : '[name]-[hash]',
     bundle: true,
+    conditions: [watchMode ? 'development' : 'production'],
     minify: !watchMode,
     logLevel: watchMode ? 'warning' : 'info',
-    watch: watchMode,
     ...options,
-    plugins: [{
+    plugins: [sveltePlugin(), {
       name: 'ex_doc',
       setup (build) {
         // Pre-compile handlebars templates.
@@ -98,7 +99,14 @@ Promise.all(formatters.map(async ({formatter, ...options}) => {
         }
       }
     }]
-  })
+  }
+
+  if (watchMode) {
+    const ctx = (await esbuild.context(options))
+    await ctx.watch()
+  } else {
+    await esbuild.build(options)
+  }
 })).catch((error) => {
   console.error(error)
   process.exit(1)

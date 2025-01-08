@@ -31,7 +31,8 @@
     "@fontsource/lato": "^4.5.10",
     "@swup/a11y-plugin": "^5.0.0",
     "@swup/progress-plugin": "^3.2.0",
-    "esbuild": "^0.16.16",
+    "esbuild": "^0.24.2",
+    "esbuild-svelte": "^0.9.0",
     "eslint": "^8.31.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
@@ -49,6 +50,7 @@
     "lunr": "^2.3.8",
     "mocha": "^10.2.0",
     "normalize.css": "^8.0.1",
+    "svelte": "^5.17.0",
     "swup": "^4.8.1"
   }
 }
